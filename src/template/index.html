@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+{% extends 'base.html' %}
+
+{% block content %}
+<form method="post" action="">
+{% csrf_token %}
+<div class="form-group">
+    <div class="form-group col-md-6">
+        {{form}}
+    <input class="btn btn-success" type="submit" value="儲存">
+</div>
+</form>
+
+<table class="table table-bordered table-striped">
+    <thead class="thead-dark">
+        <tr>
+            <th>ID</th>
+            <th>帳戶</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for Debt in Debt %}
+            <tr>
+                <td>{{ Debt.DcID }}</td>
+                <td>{{ Debt.Account }}</td>
+                <td>
+                    <a href="{% url 'Update' Debt.id %}" class="btn btn-info">修改</a>
+                    <a href="{% url 'Delete' Debt.id %}" class="btn btn-danger">刪除</a>
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{%endblock%}
+
+
+<!-- <html>
+  <head>
+    <meta charset="utf-8">
+    <title>Test</title>
+  </head>
+  <body>
+    <table class="table" border="1">
+        <thead>
+            <tr>
+                <th>ID</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in posts %}
+            <tr>
+                <td>{{item.DcID}}</td>
+                <td>{{item.UserName}}</td>
+                <td>{{item.Account}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+  </body>
+</html> -->
