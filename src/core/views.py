@@ -18,10 +18,9 @@ def home(request):
     }
     return render(request,'index.html',context)
 
-
 def update(request, pk):
-    Debts = get_object_or_404(Debt, pk=pk)
-    form = DebtForm(instance=Debt)
+    Debts = Debt.objects.get(id = pk)
+    form = DebtForm(instance=Debts)
 
     if request.method == "POST":
         form = DebtForm(request.POST, instance=Debts)
@@ -36,7 +35,7 @@ def update(request, pk):
 
 def delete(request, pk):
     Debts = get_object_or_404(Debt, pk=pk)
-    form = DebtForm(instance=Debt)
+    form = DebtForm(instance=Debts)
 
     if request.method == "POST":
         form = DebtForm(request.POST, instance=Debts)
