@@ -18,10 +18,13 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from core import views
+from core.views import api
+
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("home", views.home, name='Home'),
+    path("", views.home, name='Home'),
     path('update/,<str:pk>', views.update, name='Update'),
-    path('delete/,<str:pk>', views.delete, name='Delete')
+    path('delete/,<str:pk>', views.delete, name='Delete'),
+    path('api/' ,api.urls),
 ]
