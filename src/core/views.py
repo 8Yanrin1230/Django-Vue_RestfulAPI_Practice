@@ -2,7 +2,6 @@ from django.shortcuts import get_object_or_404, redirect, render
 from .models import Debt
 from .forms import DebtForm
 from ninja import NinjaAPI, Schema
-from typing import Optional
 import json
 from django.http import JsonResponse
 from django.core import serializers
@@ -62,20 +61,20 @@ def delete_debt(request, pk: int):
 
 
 #API methods#s
-def home(request):
-    form = DebtForm()
-    Debts = Debt.objects.all()
+# def home(request):
+#     form = DebtForm()
+#     Debts = Debt.objects.all()
 
-    if request.method == "POST":
-        form = DebtForm(request.POST)
-        if form.is_valid():
-            form.save()
+#     if request.method == "POST":
+#         form = DebtForm(request.POST)
+#         if form.is_valid():
+#             form.save()
 
-    context = {
-        "Debt": Debts,
-        "form": form
-    }
-    return render(request,'index.html',context)
+#     context = {
+#         "Debt": Debts,
+#         "form": form
+#     }
+#     return render(request,'index.html',context)
 
 # def update(request, pk):
 #     Debts = Debt.objects.get(id = pk)

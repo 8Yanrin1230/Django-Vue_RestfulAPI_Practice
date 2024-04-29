@@ -20,14 +20,15 @@
         </tr>
     </thead>
     <tbody>
-        {% for Debts in Debt %}
+        {% for Debt in Debt %}
             <tr>
-                <td>{{ Debts.id }}</td>
-                <td>{{ Debts.DcID }}</td>
-                <td>{{ Debts.Account }}</td>
-                <td>
-                    <!-- <a href="http://127.0.0.1:8000/api/debts/{{Debts.id}}"  class="btn btn-info">修改</a> -->
-                </td>
+                <td>{{ Debt.id }}</td>
+                <td>{{ Debt.DcID }}</td>
+                <td>{{ Debt.Account }}</td>
+                <!-- <td>
+                    <a href="{% url 'Update' Debt.id %}" class="btn btn-info">修改</a>
+                    <a href="{% url 'Delete' Debt.id %}" class="btn btn-danger">刪除</a>
+                </td> -->
             </tr>
         {% endfor %}
     </tbody>
