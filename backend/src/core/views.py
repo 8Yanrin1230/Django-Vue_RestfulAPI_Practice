@@ -2,9 +2,10 @@ from django.shortcuts import get_object_or_404, redirect, render
 from .models import Debt
 from .forms import DebtForm
 from ninja import NinjaAPI, Schema
-import json
 from django.http import JsonResponse
 from django.core import serializers
+import json
+
 
 api = NinjaAPI()
 
