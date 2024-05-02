@@ -81,7 +81,6 @@ def delete_debt(request, pk: int):
     json_data = serializers.serialize('json', [debt])
     return JsonResponse(json.loads(json_data), safe=False)
 
-
 #API methods#s
 # def home(request):
 #     form = DebtForm()
