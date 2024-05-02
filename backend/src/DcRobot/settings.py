@@ -55,7 +55,7 @@ MIDDLEWARE = [
 ]
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5174",  # 允許來自這個源的請求
+    "http://localhost:5173",  # 允許來自這個源的請求
     # 您也可以添加其他源
 ]
 
