@@ -7,7 +7,6 @@ from collections import defaultdict
 from asgiref.sync import sync_to_async
 
 
-
 # intents是要求機器人的權限
 intents = discord.Intents.all()
 
