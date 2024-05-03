@@ -4,6 +4,9 @@ from .forms import DebtForm
 from ninja import NinjaAPI, Schema
 from django.http import JsonResponse
 from django.core import serializers
+from DC.DcRobot import *
+
+
 import json
 
 
@@ -17,8 +20,25 @@ class Tags(Schema):
     Record: str
     Account: str
     PokerID: str
-    PokerID2: str
     Total: float
+    clear : bool
+    WOL : bool
+
+class Record(Schema):
+    debtors: str
+    creditors: str
+    amount: float
+
+@api.get("/records")
+
+def get_record(request):
+    try:
+        with open('debt_transfers.json', 'r') as f:
+            data = json.load(f)
+            return JsonResponse(data, safe=False)
+    except FileNotFoundError:
+        print("debt_transfers.json 文件不存在")
+        return None
 
 @api.get("/debts", response=list[Tags])
 def get_debt(request):
@@ -35,8 +55,9 @@ def create_debt(request, data: Tags):
         Record = tag_data.Record,
         Account = tag_data.Account,
         PokerID = tag_data.PokerID,
-        PokerID2 = tag_data.PokerID2,
         Total = tag_data.Total,
+        clear = False,
+        WOL = True,
     )
     debt.save()
     return tag_data
@@ -59,7 +80,6 @@ def delete_debt(request, pk: int):
     debt.delete()
     json_data = serializers.serialize('json', [debt])
     return JsonResponse(json.loads(json_data), safe=False)
-
 
 #API methods#s
 # def home(request):
