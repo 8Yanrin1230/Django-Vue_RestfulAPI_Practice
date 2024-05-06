@@ -3,10 +3,10 @@
       <div id="app">
         <h1>Debt List</h1>
         <form @submit.prevent="add">
-          <div v-for="(value, key) in newDebts" :key="key">
+          <div v-for="(value, key) in newRecords" :key="key">
             <div v-if="key !== 'id'">
               <label>{{ key }}</label>
-              <input v-model="newDebts[key]" :placeholder="`Input ${key}`" />
+              <input v-model="newRecords[key]" :placeholder="`Input ${key}`" />
             </div>
           </div>
           <button type="submit">Add</button>
@@ -22,13 +22,13 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="debt in debts" :key="debt.DcID">
-              <td>{{ debt.id }}</td>
-              <td>{{ debt.UserName }}</td>
-              <td>{{ debt.Total }}</td>
+            <tr v-for="record in records" :key="record.DcID">
+              <td>{{ record.id }}</td>
+              <td>{{ record.UserName }}</td>
+              <td>{{ record.Total }}</td>
               <td>
-                <button class="btn btn-sm btn-info" @click="get_id(debt.id)" data-bs-toggle="modal" data-bs-target="#staticBackdrop">Edit</button>
-                <button class="btn btn-sm btn-danger" @click="get_id(debt.id)" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">刪除</button>
+                <button class="btn btn-sm btn-info" @click="get_id(record.id)" data-bs-toggle="modal" data-bs-target="#staticBackdrop">Edit</button>
+                <button class="btn btn-sm btn-danger" @click="get_id(record.id)" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">刪除</button>
               </td>
             </tr>
           </tbody>
@@ -41,10 +41,10 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
               </div>
               <div class="modal-body">
-                <div v-for="(value, key) in newDebts" :key="key">
+                <div v-for="(value, key) in newRecords" :key="key">
                   <div v-if="key !== 'id'">
                   <label>{{ key }}</label>
-                  <input v-model="newDebts[key]" :placeholder="`Input ${key}`" />
+                  <input v-model="newRecords[key]" :placeholder="`Input ${key}`" />
                 </div>
               </div>
               </div>
@@ -98,8 +98,8 @@
       name: 'App',
       data() {
         return {
-          debts: [],
-          newDebts:{
+          records: [],
+          newRecords:{
             id: 0,
             DcID: '',
             UserName: '',
@@ -107,7 +107,6 @@
             Account: '',
             PokerID: '',
             Total:0,
-            clear: false,
             WOL: true
           },
           select_which:Number
@@ -119,18 +118,17 @@
 
       methods: {
        async fetch() {
-          axios.get('http://127.0.0.1:8000/api/debts')
+          axios.get('http://127.0.0.1:8000/api/records')
             .then(response => {
-              this.debts = response.data.map(debt => new Tag(
-                debt.id,
-                debt.DcID,
-                debt.UserName,
-                debt.Record,
-                debt.Account,
-                debt.PokerID,
-                debt.Total,
-                debt.clear,
-                debt.WOL,
+              this.records = response.data.map(record => new Tag(
+                record.id,
+                record.DcID,
+                record.UserName,
+                record.Record,
+                record.Account,
+                record.PokerID,
+                record.Total,
+                record.WOL,
               ));
             })
             .catch(error => {
@@ -138,30 +136,30 @@
             })
         },
        async add() {
-          axios.post('http://127.0.0.1:8000/api/debts',this.newDebts)
+          axios.post('http://127.0.0.1:8000/api/records',this.newRecords)
             .then(response => {
-              this.debts.push(this.newDebts);
+              this.records.push(this.newRecords);
               window.location.reload();
             })
             .catch(error => {
               console.error(error)
             })
         },
-        update(id) {
-          this.newDebts.id = id
-          axios.put(`http://127.0.0.1:8000/api/debts/${id}`,this.newDebts)
+        async update(id) {
+          this.newRecords.id = id
+          axios.put(`http://127.0.0.1:8000/api/records/${id}`,this.newRecords)
             .then(response =>{
-              this.debts.push(this.newDebts);
+              this.records.push(this.newRecords);
               window.location.reload();
             })
             .catch(error => {
               console.error(error)
             })
         },
-        deleteTodo(id) {
-          axios.delete(`http://127.0.0.1:8000/api/debts/${id}`)
+        async deleteTodo(id) {
+          axios.delete(`http://127.0.0.1:8000/api/records/${id}`)
             .then(() => {
-              this.debts = this.debts.filter(debt => debt.id !== id)
+              this.records = this.records.filter(record => record.id !== id)
               window.location.reload();
             })
             .catch(error => {

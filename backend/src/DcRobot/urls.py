@@ -24,7 +24,5 @@ from core.views import api
 urlpatterns = [
     path("admin/", admin.site.urls),
     # path("", views.home, name='Home'),
-    # path('update/,<str:pk>', views.update, name='Update'),
-    # path('delete/,<str:pk>', views.delete, name='Delete'),
     path('api/' ,api.urls),
 ]
