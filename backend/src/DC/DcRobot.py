@@ -1,11 +1,11 @@
 import discord
 import requests
 import json
-from core.models import Debt
+from core.models import Records
 from discord.ext import commands
 from collections import defaultdict
 from asgiref.sync import sync_to_async
-
+from django.db.models import Q
 
 # intents是要求機器人的權限
 intents = discord.Intents.all()
@@ -15,21 +15,20 @@ bot = commands.Bot(command_prefix = "%", intents = intents)
 
 def selectUser(ctx):
     user_id = ctx.author.id
-    debt =  Debt.objects.get(DcID=user_id)
+    debt =  Records.objects.get(DcID=user_id)
 
 async def add(datas):
      for data in datas:
-        tests =  Debt.objects.filter(PokerID=data[0])
+        tests =  Records.objects.filter(PokerID=data[0])
         async for test in tests:
-            debt = Debt(
+            debt = Records(
                 DcID = test.DcID,
                 UserName = test.UserName,
                 Account = test.Account,
                 PokerID = test.PokerID,
-
                 Total = data[1],
-                clear = False,
                 WOL = True,
+                Balance = data[1],
             )
             break
         await sync_to_async(debt.save, thread_sensitive=True)()
@@ -83,11 +82,54 @@ async def NewGame(ctx, *, message):
 async def result(ctx):
     await DebtRecord.pay_debts(ctx)
 
-@bot.command()
-async def test(ctx):
-    await ctx.send(DebtRecord.go())
-    debt_transfers_json = json.dumps(DebtRecord.debt_transfers_dict)
-    await ctx.send(debt_transfers_json)
+async def test2(creditor_id , debtor_id , amount):
+
+    new_datas = []  # 建立一個新的列表來存放需要保留的資料
+
+    amountx = amount
+    amounty = amount
+    creditor_qs = Records.objects.filter(DcID=creditor_id).exclude(Balance=0)
+    debtor_qs = Records.objects.filter(DcID=debtor_id).exclude(Balance=0)
+
+    async for debtor in debtor_qs:
+        if amountx > -debtor.Balance:
+            amountx += debtor.Balance
+            debtor.Balance = 0
+        elif amountx < -debtor.Balance:
+
+            debtor.Balance += amountx
+            amountx = 0
+        elif amountx == -debtor.Balance:
+            debtor.Balance = 0
+            amountx = 0
+        await sync_to_async(debtor.save, thread_sensitive=True)()
+
+    async for creditor in creditor_qs:
+        if amounty > creditor.Balance:
+            amounty -= creditor.Balance
+            creditor.Balance = 0
+        elif amounty < creditor.Balance:
+            creditor.Balance -= amounty
+            amounty = 0
+        elif amounty == creditor.Balance:
+            creditor.Balance = 0
+            amounty = 0
+        await sync_to_async(creditor.save, thread_sensitive=True)()
+
+    # 如果最後 amountx 和 amounty 都等於 0，則不將這一行資料加入新的列表中
+    if amountx == 0 and amounty == 0:
+        print("ok")
+    else:
+        data = {
+            creditor_id,
+            debtor_id,
+            amount
+        }
+        new_datas.append(data)
+
+    # 將新的資料列表寫回 debt_transfers.json 檔案
+    with open('debt_transfers.json', 'w') as f:
+        json.dump(new_datas, f, indent=4)
 
 def save_debt_transfers_to_json():
     with open('debt_transfers.json', 'w') as f:
@@ -105,10 +147,10 @@ class DebtRecord:
         try:
             records=[]
             # 取得所有債務記錄
-            debts = Debt.objects.all()
+            debts = Records.objects.all()
             async for debt in debts:
-                    records.append(DebtRecord(debt.DcID, debt.Total))
-
+                    if debt.Balance != 0:
+                        records.append(DebtRecord(debt.DcID, debt.Balance))
             return records
 
         except Exception as e:
@@ -144,7 +186,7 @@ class DebtRecord:
             # 移除淨債務額為0的人
             sorted_net_debts = [x for x in sorted_net_debts if x[1] != 0]
 
-
+        DebtRecord.debt_transfers_dict.clear()
         # 輸出債務轉移記錄
         for debtor_id, creditor_id, amount in debt_transfers:
             # debtor = ctx.guild.get_member(debtor_id)
@@ -156,7 +198,6 @@ class DebtRecord:
             }
             DebtRecord.debt_transfers_dict.append(record)
         save_debt_transfers_to_json()
-
 
 # #總金額增減
 # async def Settlement(conn, ID, money):
